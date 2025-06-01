@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desarme a Armadilha! | RPG de Mesa (Modo Hard)</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            user-select: none;
+            background-image: url('https://i.pinimg.com/736x/a4/3d/31/a43d31e34303bfc39f2d3c21ab796222.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .container {
+            max-width: 500px;
+            margin: 20px auto;
+            background: rgba(44, 62, 80, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+            border: 2px solid #e74c3c;
+        }
+        h1 {
+            color: #e74c3c;
+            text-shadow: 0 0 5px #000;
+        }
+        .qte-bar {
+            width: 100%;
+            height: 30px;
+            background: #333;
+            margin: 20px 0;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+        .qte-marker {
+            width: 10px;
+            height: 100%;
+            background: #e74c3c;
+            position: absolute;
+            left: 0;
+            border-radius: 5px;
+        }
+        .qte-zone {
+            height: 100%;
+            background: #2ecc71;
+            position: absolute;
+            opacity: 0.7;
+        }
+        button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        button:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            min-height: 30px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            color: #2ecc71;
+            background: rgba(46, 204, 113, 0.2);
+            text-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+        }
+        .fail {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.2);
+            text-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="container">
+        <h1>𓅓 ARMADILHA ATIVADA! 𓅓</h1>
+        <p>Clique no botão quando o marcador estiver na zona <span style="color: #2ecc71; font-weight: bold;">VERDE</span>!</p>
+        
+        <div class="qte-bar">
+            <div class="qte-zone" id="qte-zone"></div>
+            <div class="qte-marker" id="qte-marker"></div>
+        </div>
+        
+        <button id="action-btn">DESARMAR</button>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const marker = document.getElementById('qte-marker');
+        const zone = document.getElementById('qte-zone');
+        const actionBtn = document.getElementById('action-btn');
+        const resultDiv = document.getElementById('result');
+        let animationId;
+        let isRunning = true;
+        let zoneSize, zoneStart;
+
+        // Gera uma zona verde aleatória (5% a 20% de tamanho)
+        function generateRandomZone() {
+            zoneSize = 5 + Math.random() * 15; // Entre 5% e 20%
+            zoneStart = Math.random() * (100 - zoneSize); // Posição aleatória (sem ultrapassar 100%)
+            
+            zone.style.width = `${zoneSize}%`;
+            zone.style.left = `${zoneStart}%`;
+        }
+
+        // Animação da barra
+        function animateMarker() {
+            let position = 0;
+            const speed = 2; // Altere para mudar a velocidade (ex: 3 = mais rápido)
+            
+            function move() {
+                position += speed;
+                if (position > 100) position = 0;
+                marker.style.left = `${position}%`;
+                
+                animationId = requestAnimationFrame(move);
+            }
+            
+            move();
+        }
+
+        // Reinicia o desafio
+        function resetChallenge() {
+            generateRandomZone();
+            resultDiv.textContent = "";
+            resultDiv.className = "result";
+            isRunning = true;
+            animateMarker();
+        }
+
+        // Inicia o jogo
+        generateRandomZone();
+        animateMarker();
+
+        // Verifica o clique do jogador
+        actionBtn.addEventListener('click', () => {
+            if (!isRunning) return;
+            
+            const markerPos = parseFloat(marker.style.left);
+            const zoneEnd = zoneStart + zoneSize;
+            
+            if (markerPos >= zoneStart && markerPos <= zoneEnd) {
+                resultDiv.textContent = "✅ Armadilha desativada!";
+                resultDiv.className = "result success";
+            } else {
+                resultDiv.textContent = "💥 ARMADILHA ATIVADA!";
+                resultDiv.className = "result fail";
+            }
+            
+            isRunning = false;
+            cancelAnimationFrame(animationId);
+            
+            // Reinicia após 3 segundos
+            setTimeout(resetChallenge, 3000);
+        });
+    </script>
+</body>
+</html>

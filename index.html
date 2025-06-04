@@ -3,8 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desarme a Armadilha! | RPG de Mesa (Modo Hard)</title>
+    <title>Desarme a Armadilha! | RPG de Mesa</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: 'Arial', sans-serif;
             color: white;
@@ -17,9 +23,13 @@
             background-position: center;
             margin: 0;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+        
         .overlay {
-            background-color: rgba(0, 0, 0, 0.7);
+            background: radial-gradient(circle at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.9) 70%);
             position: fixed;
             top: 0;
             left: 0;
@@ -27,162 +37,272 @@
             height: 100%;
             z-index: -1;
         }
+        
         .container {
-            max-width: 500px;
-            margin: 20px auto;
-            background: rgba(44, 62, 80, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
-            border: 2px solid #e74c3c;
-        }
-        h1 {
-            color: #e74c3c;
-            text-shadow: 0 0 5px #000;
-        }
-        .qte-bar {
-            width: 100%;
-            height: 30px;
-            background: #333;
-            margin: 20px 0;
-            border-radius: 5px;
-            overflow: hidden;
+            max-width: 400px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            border: 3px solid #ffffff;
             position: relative;
+            z-index: 10;
+            backdrop-filter: blur(5px);
         }
-        .qte-marker {
-            width: 10px;
+        
+        h1 {
+            color: #ffffff;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            margin-bottom: 15px;
+            font-size: 28px;
+            letter-spacing: 1px;
+        }
+        
+        .instructions {
+            margin-bottom: 20px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #ddd;
+            max-width: 350px;
+            margin: 0 auto 20px;
+        }
+        
+        .qte-container {
+            margin: 20px auto;
+            position: relative;
+            width: 250px;
+            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .qte-ring-outer {
+            width: 100%;
             height: 100%;
-            background: #e74c3c;
-            position: absolute;
-            left: 0;
-            border-radius: 5px;
+            border-radius: 50%;
+            background: #000;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            border: 2px solid white;
         }
+        
+        .qte-ring-inner {
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            background: #000;
+            border-radius: 50%;
+            top: 15%;
+            left: 15%;
+            z-index: 2;
+            border: 1px solid white;
+        }
+        
         .qte-zone {
-            height: 100%;
-            background: #2ecc71;
             position: absolute;
-            opacity: 0.7;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            z-index: 1;
+            background: 
+                radial-gradient(
+                    circle at center,
+                    transparent 45%,
+                    rgba(0, 0, 0, 0) 46%,
+                    rgba(0, 0, 0, 0) 100%
+                ),
+                conic-gradient(
+                    from var(--zone-start, 0deg),
+                    #ffffff 0deg,
+                    #ffffff var(--zone-size, 30deg),
+                    transparent var(--zone-size, 30deg)
+                );
         }
+        
+        .qte-marker {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(145deg, #f0f0f0, #cccccc);
+            border-radius: 50%;
+            position: absolute;
+            z-index: 10;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            border: 2px solid #aaaaaa;
+            /* Posição inicial removida para controle total via JS */
+        }
+        
         button {
-            background: #e74c3c;
-            color: white;
+            background: linear-gradient(to bottom, #f0f0f0, #cccccc);
+            color: #333;
             border: none;
-            padding: 12px 25px;
+            padding: 14px 30px;
             font-size: 18px;
-            border-radius: 5px;
+            border-radius: 50px;
             cursor: pointer;
             transition: 0.3s;
             font-weight: bold;
             text-transform: uppercase;
+            margin-top: 15px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
+            border: 2px solid #aaaaaa;
         }
+        
         button:hover {
-            background: #c0392b;
-            transform: scale(1.05);
+            background: linear-gradient(to bottom, #ffffff, #dddddd);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
         }
+        
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+        
         .result {
             margin-top: 20px;
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
-            min-height: 30px;
-            padding: 10px;
-            border-radius: 5px;
+            min-height: 40px;
+            padding: 15px;
+            border-radius: 8px;
+            transition: all 0.5s ease;
         }
+        
         .success {
             color: #2ecc71;
-            background: rgba(46, 204, 113, 0.2);
+            background: rgba(46, 204, 113, 0.15);
             text-shadow: 0 0 5px rgba(46, 204, 113, 0.5);
+            animation: pulse 0.5s ease;
         }
+        
         .fail {
-            color: #e74c3c;
-            background: rgba(231, 76, 60, 0.2);
-            text-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+            color: #cccccc;
+            background: rgba(150, 150, 150, 0.15);
+            text-shadow: 0 0 5px rgba(150, 150, 150, 0.5);
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
         }
     </style>
 </head>
 <body>
     <div class="overlay"></div>
     <div class="container">
-        <h1>𓅓 ARMADILHA ATIVADA! 𓅓</h1>
-        <p>Clique no botão quando o marcador estiver na zona <span style="color: #2ecc71; font-weight: bold;">VERDE</span>!</p>
+        <h1>DESARME A ARMADILHA!</h1>
+        <p class="instructions">Pressione o botão quando o marcador estiver dentro da zona branca para desarmar a armadilha</p>
         
-        <div class="qte-bar">
-            <div class="qte-zone" id="qte-zone"></div>
-            <div class="qte-marker" id="qte-marker"></div>
+        <div class="qte-container">
+            <div class="qte-ring-outer" id="qteRing">
+                <div class="qte-zone" id="qteZone"></div>
+                <div class="qte-ring-inner"></div>
+                <div class="qte-marker" id="qteMarker"></div>
+            </div>
         </div>
         
-        <button id="action-btn">DESARMAR</button>
-        
+        <button id="actionButton">Pressionar Agora!</button>
         <div class="result" id="result"></div>
     </div>
 
     <script>
-        const marker = document.getElementById('qte-marker');
-        const zone = document.getElementById('qte-zone');
-        const actionBtn = document.getElementById('action-btn');
-        const resultDiv = document.getElementById('result');
+        const qteZone = document.getElementById('qteZone');
+        const qteMarker = document.getElementById('qteMarker');
+        const actionButton = document.getElementById('actionButton');
+        const resultDisplay = document.getElementById('result');
+        
+        let markerAngle = 0;
+        let zoneStart = 0;
+        let zoneSize;
         let animationId;
-        let isRunning = true;
-        let zoneSize, zoneStart;
-
-        // Gera uma zona verde aleatória (5% a 20% de tamanho)
-        function generateRandomZone() {
-            zoneSize = 5 + Math.random() * 15; // Entre 5% e 20%
-            zoneStart = Math.random() * (100 - zoneSize); // Posição aleatória (sem ultrapassar 100%)
+        const speed = 5;
+        let isRunning = false;
+        
+        function initQTE() {
+            resultDisplay.textContent = '';
+            resultDisplay.className = 'result';
             
-            zone.style.width = `${zoneSize}%`;
-            zone.style.left = `${zoneStart}%`;
-        }
-
-        // Animação da barra
-        function animateMarker() {
-            let position = 0;
-            const speed = 2; // Altere para mudar a velocidade (ex: 3 = mais rápido)
+            zoneSize = Math.floor(Math.random() * 16) + 15;
+            zoneStart = Math.random() * 330;
             
-            function move() {
-                position += speed;
-                if (position > 100) position = 0;
-                marker.style.left = `${position}%`;
-                
-                animationId = requestAnimationFrame(move);
-            }
+            qteZone.style.setProperty('--zone-start', `${zoneStart}deg`);
+            qteZone.style.setProperty('--zone-size', `${zoneSize}deg`);
             
-            move();
-        }
-
-        // Reinicia o desafio
-        function resetChallenge() {
-            generateRandomZone();
-            resultDiv.textContent = "";
-            resultDiv.className = "result";
+            markerAngle = Math.random() * 360;
             isRunning = true;
+            
             animateMarker();
         }
-
-        // Inicia o jogo
-        generateRandomZone();
-        animateMarker();
-
-        // Verifica o clique do jogador
-        actionBtn.addEventListener('click', () => {
+        
+        function animateMarker() {
+            markerAngle = (markerAngle + speed) % 360;
+            const radians = markerAngle * Math.PI / 180;
+            
+            // Dimensões precisas para alinhamento perfeito
+            const containerSize = 250;   // Tamanho do container
+            const markerSize = 20;       // Tamanho do marcador
+            const ringWidth = 30;        // Espessura do anel (calculada)
+            
+            // Cálculo preciso dos raios
+            const outerRadius = containerSize / 2;
+            const innerRadius = outerRadius * 0.7 / 2 * 1.05; // Ajuste fino
+            const middleRadius = (outerRadius + innerRadius) / 2;
+            
+            // Centro exato do container
+            const centerX = containerSize / 2;
+            const centerY = containerSize / 2;
+            
+            // Posição do centro do marcador
+            const x = centerX + middleRadius * Math.sin(radians) - markerSize / 2;
+            const y = centerY - middleRadius * Math.cos(radians) - markerSize / 2;
+            
+            qteMarker.style.left = `${x}px`;
+            qteMarker.style.top = `${y}px`;
+            
+            animationId = requestAnimationFrame(animateMarker);
+        }
+        
+        function checkHit() {
             if (!isRunning) return;
             
-            const markerPos = parseFloat(marker.style.left);
-            const zoneEnd = zoneStart + zoneSize;
+            cancelAnimationFrame(animationId);
+            isRunning = false;
             
-            if (markerPos >= zoneStart && markerPos <= zoneEnd) {
-                resultDiv.textContent = "✅ Armadilha desativada!";
-                resultDiv.className = "result success";
+            const endAngle = (zoneStart + zoneSize) % 360;
+            let hit = false;
+            
+            if (zoneStart < endAngle) {
+                hit = (markerAngle >= zoneStart && markerAngle <= endAngle);
             } else {
-                resultDiv.textContent = "💥 ARMADILHA ATIVADA!";
-                resultDiv.className = "result fail";
+                hit = (markerAngle >= zoneStart || markerAngle <= endAngle);
             }
             
-            isRunning = false;
-            cancelAnimationFrame(animationId);
+            if (hit) {
+                resultDisplay.textContent = 'SUCESSO! Armadilha desarmada!';
+                resultDisplay.className = 'result success';
+            } else {
+                resultDisplay.textContent = 'FALHA! A armadilha foi ativada!';
+                resultDisplay.className = 'result fail';
+            }
             
-            // Reinicia após 3 segundos
-            setTimeout(resetChallenge, 3000);
-        });
+            setTimeout(initQTE, 2000);
+        }
+        
+        actionButton.addEventListener('click', checkHit);
+        
+        initQTE();
     </script>
 </body>
 </html>

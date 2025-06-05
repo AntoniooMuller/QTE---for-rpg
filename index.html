@@ -58,15 +58,6 @@
             letter-spacing: 1px;
         }
         
-        .instructions {
-            margin-bottom: 20px;
-            font-size: 16px;
-            line-height: 1.5;
-            color: #ddd;
-            max-width: 350px;
-            margin: 0 auto 20px;
-        }
-        
         .qte-container {
             margin: 20px auto;
             position: relative;
@@ -129,7 +120,7 @@
             z-index: 10;
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
             border: 2px solid #aaaaaa;
-            /* Posição inicial removida para controle total via JS */
+            transform: translate(-50%, -50%);
         }
         
         button {
@@ -203,7 +194,6 @@
     <div class="overlay"></div>
     <div class="container">
         <h1>DESARME A ARMADILHA!</h1>
-        <p class="instructions">Pressione o botão quando o marcador estiver dentro da zona branca para desarmar a armadilha</p>
         
         <div class="qte-container">
             <div class="qte-ring-outer" id="qteRing">
@@ -250,26 +240,25 @@
             markerAngle = (markerAngle + speed) % 360;
             const radians = markerAngle * Math.PI / 180;
             
-            // Dimensões precisas para alinhamento perfeito
-            const containerSize = 250;   // Tamanho do container
-            const markerSize = 20;       // Tamanho do marcador
-            const ringWidth = 30;        // Espessura do anel (calculada)
+            // Tamanho do container e do marcador
+            const containerSize = 250;
+            const markerSize = 20;
             
-            // Cálculo preciso dos raios
-            const outerRadius = containerSize / 2;
-            const innerRadius = outerRadius * 0.7 / 2 * 1.05; // Ajuste fino
-            const middleRadius = (outerRadius + innerRadius) / 2;
+            // Cálculo preciso do raio do anel
+            const ringWidth = (containerSize * (1 - 0.7)) / 2; // (100% - 70%) / 2
+            const ringCenterRadius = containerSize / 2 - ringWidth;
             
-            // Centro exato do container
+            // Centro do container
             const centerX = containerSize / 2;
             const centerY = containerSize / 2;
             
             // Posição do centro do marcador
-            const x = centerX + middleRadius * Math.sin(radians) - markerSize / 2;
-            const y = centerY - middleRadius * Math.cos(radians) - markerSize / 2;
+            const markerX = centerX + ringCenterRadius * Math.sin(radians);
+            const markerY = centerY - ringCenterRadius * Math.cos(radians);
             
-            qteMarker.style.left = `${x}px`;
-            qteMarker.style.top = `${y}px`;
+            // Posiciona o centro do marcador
+            qteMarker.style.left = `${markerX}px`;
+            qteMarker.style.top = `${markerY}px`;
             
             animationId = requestAnimationFrame(animateMarker);
         }
